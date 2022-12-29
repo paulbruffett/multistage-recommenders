@@ -13,8 +13,9 @@ jobs:
   permissions:
     pull-requests: write
   steps:
-    - uses: actions/checkout@v3
-    - uses: hashicorp/setup-terraform@v2
+    - name: "terraform"
+      - uses: actions/checkout@v3
+      - uses: hashicorp/setup-terraform@v2
 
     - name: Terraform fmt
       id: fmt
