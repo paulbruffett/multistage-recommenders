@@ -72,7 +72,7 @@ resource "azurerm_storage_account" "aml" {
   account_replication_type = "GRS"
 }
 resource "azurerm_storage_container" "aml" {
-  name                  = "ecommData"
+  name                  = "pbecommdata"
   storage_account_name  = azurerm_storage_account.aml.name
   container_access_type = "private"
 }
