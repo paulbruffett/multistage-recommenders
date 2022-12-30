@@ -69,7 +69,7 @@ jobs:
         if: github.ref == 'refs/heads/main' && github.event_name == 'push'
         run: terraform apply -auto-approve
           
-      # Connect or Create the Azure Machine Learning Workspace
+"""      # Connect or Create the Azure Machine Learning Workspace
       - name: Connect/Create Azure Machine Learning Workspace
         id: aml_workspace
         uses: Azure/aml-workspace@v1
@@ -88,4 +88,4 @@ jobs:
         id: aml_run
         uses: Azure/aml-run@v1
         with:
-            azure_credentials: ${{ secrets.AZURE_CREDENTIALS }}
+            azure_credentials: ${{ secrets.AZURE_CREDENTIALS }}"""

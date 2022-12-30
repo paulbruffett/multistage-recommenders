@@ -99,3 +99,27 @@ resource "azurerm_machine_learning_workspace" "aml" {
     type = "SystemAssigned"
   }
 }
+
+resource "azurerm_virtual_network" "mlcompute" {
+  name                = "mlcompute-vnet"
+  address_space       = ["10.1.0.0/16"]
+  location            = azurerm_resource_group.aml.location
+  resource_group_name = azurerm_resource_group.aml.name
+}
+
+resource "azurerm_subnet" "mltrainingcluster" {
+  name                 = "mltraining-subnet"
+  resource_group_name  = azurerm_resource_group.aml.name
+  virtual_network_name = azurerm_virtual_network.mlcompute.name
+  address_prefixes     = ["10.1.0.0/24"]
+}
+
+resource "azurerm_machine_learning_compute_instance" "dataprep" {
+  name                          = "dataprep"
+  location                      = azurerm_resource_group.aml.location
+  machine_learning_workspace_id = azurerm_machine_learning_workspace.aml.id
+  virtual_machine_size          = "STANDARD_DS12_V2"
+
+
+  subnet_resource_id = azurerm_subnet.mltrainingcluster.id
+}
