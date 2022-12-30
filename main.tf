@@ -114,12 +114,21 @@ resource "azurerm_subnet" "mltrainingcluster" {
   address_prefixes     = ["10.1.0.0/24"]
 }
 
-resource "azurerm_machine_learning_compute_instance" "dataprep" {
-  name                          = "dataprep"
-  location                      = azurerm_resource_group.aml.location
+resource "azurerm_machine_learning_compute_cluster" "dataprep" {
+  name                          = "dataprepcpu"
+  location                      = azurerm_resource_group.example.location
+  vm_priority                   = "Dedicated"
+  vm_size                       = "Standard_DS12_v2"
   machine_learning_workspace_id = azurerm_machine_learning_workspace.aml.id
-  virtual_machine_size          = "STANDARD_DS12_V2"
+  subnet_resource_id            = azurerm_subnet.mltrainingcluster.id
 
+  scale_settings {
+    min_node_count                       = 0
+    max_node_count                       = 1
+    scale_down_nodes_after_idle_duration = "PT30S" # 30 seconds
+  }
 
-  subnet_resource_id = azurerm_subnet.mltrainingcluster.id
+  identity {
+    type = "SystemAssigned"
+  }
 }
