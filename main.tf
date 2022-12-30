@@ -116,7 +116,7 @@ resource "azurerm_subnet" "mltrainingcluster" {
 
 resource "azurerm_machine_learning_compute_cluster" "dataprep" {
   name                          = "dataprepcpu"
-  location                      = azurerm_resource_group.example.location
+  location                      = azurerm_resource_group.aml.location
   vm_priority                   = "Dedicated"
   vm_size                       = "Standard_DS12_v2"
   machine_learning_workspace_id = azurerm_machine_learning_workspace.aml.id
