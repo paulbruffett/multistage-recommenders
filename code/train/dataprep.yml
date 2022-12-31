@@ -1,0 +1,6 @@
+$schema: https://azuremlschemas.azureedge.net/latest/commandJob.schema.json
+command: |
+  python dataprep.py
+code: src
+environment: prep_env
+compute: azureml:dataprep

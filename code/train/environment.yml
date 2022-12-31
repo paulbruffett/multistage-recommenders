@@ -9,5 +9,6 @@ dependencies:
     - azureml-core==1.48.0
     - azure-storage-blob
     - mlflow
+    - azure-ai-ml
 channels:
   - conda-forge
