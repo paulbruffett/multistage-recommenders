@@ -33,5 +33,5 @@ jobs:
     - name: run job
       run: |
           source "${{ github.workspace }}/infra/sdk_helpers.sh";
-          bash -x run-job.sh hello-code.yml
+          bash -x run-job.sh dataprep.yml
       working-directory: code/train
