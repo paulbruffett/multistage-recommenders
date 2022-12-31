@@ -132,7 +132,6 @@ resource "azurerm_machine_learning_compute_cluster" "dataprep" {
     scale_down_nodes_after_idle_duration = "PT30S" # 30 seconds
   }
 
-  primary_user_assigned_identity = azurerm_user_assigned_identity.pbmlidentity.id
   identity {
     type = "UserAssigned"
     identity_ids = [
