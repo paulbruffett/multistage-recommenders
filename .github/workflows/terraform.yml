@@ -69,3 +69,9 @@ jobs:
         if: github.ref == 'refs/heads/main' && github.event_name == 'push'
         run: terraform apply -auto-approve
           
+          
+      - name: Submit training run
+        id: aml_run
+        uses: Azure/aml-run@v1
+        with:
+            azure_credentials: ${{ secrets.AZURE_CREDENTIALS }}
