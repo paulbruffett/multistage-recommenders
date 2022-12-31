@@ -34,4 +34,4 @@ jobs:
       run: |
           source "${{ github.workspace }}/infra/sdk_helpers.sh";
           bash -x ../../run-job.sh hello-code.yml
-      working-directory: cli/jobs/basics
+      working-directory: code/train
