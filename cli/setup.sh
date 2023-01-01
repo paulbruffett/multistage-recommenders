@@ -27,7 +27,7 @@ az extension add -n ml -y
 ## For backward compatibility - running on old subscription
 # <set_variables>
 GROUP="azure-ml"
-LOCATION="westus"
+LOCATION="West US"
 WORKSPACE="recommend-pb-workspace"
 # </set_variables>
 
