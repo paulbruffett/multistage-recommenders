@@ -55,7 +55,7 @@ running=("Queued" "NotStarted" "Starting" "Preparing" "Running" "Finalizing")
 while [[ ${running[*]} =~ $status ]]
 do
   echo $job_uri
-  sleep 8 
+  sleep 15
   status=$(az ml job show -n $run_id --query status -o tsv)
   echo $status
 done
