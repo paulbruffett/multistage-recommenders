@@ -16,7 +16,9 @@ datastore = ws.get_default_datastore()
 c_client=datastore.blob_service.get_container_client(datastore.container_name)
 
 for i in ["common_features_train.csv", "sample_skeleton_train.csv"]:
-    client = datastore.blob_service.get_blob_client(datastore.container_name,"aliccp/"+i)
+    filename = "aliccp/"+i
+    print(filename)
+    client = datastore.blob_service.get_blob_client(filename)
     blob_stream = client.download_blob()
     with open(file=i, mode="wb") as download_file:
         download_file.write(blob_stream.readall())
