@@ -5,6 +5,13 @@ on:
     branches:
     - main
   pull_request:
+    branches:
+      - main
+    paths:
+      - code/train/**
+      - infra/**
+      - .github/workflows/dataprep.yml
+      - cli/setup.sh
 
 jobs:
   prep_and_train:
@@ -69,3 +76,18 @@ jobs:
         if: github.ref == 'refs/heads/main' && github.event_name == 'push'
         run: terraform apply -auto-approve
           
+      - name: azure login
+        uses: azure/login@v1
+        with:
+          creds: ${{secrets.AZURE_CREDENTIALS}}
+      - name: setup-cli
+        run: |
+            source "${{ github.workspace }}/infra/sdk_helpers.sh";
+            bash setup.sh
+        working-directory: cli
+        continue-on-error: true
+      - name: run job
+        run: |
+            source "${{ github.workspace }}/infra/sdk_helpers.sh";
+            bash -x run-job.sh dataprep.yml
+        working-directory: code/train
