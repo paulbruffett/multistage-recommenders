@@ -95,6 +95,7 @@ resource "azurerm_machine_learning_workspace" "aml" {
   storage_account_id      = azurerm_storage_account.aml.id
   container_registry_id   = azurerm_container_registry.aml.id
 
+  primary_user_assigned_identity = azurerm_user_assigned_identity.pbmlidentity.id
   identity {
     type = "UserAssigned"
     identity_ids = [
