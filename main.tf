@@ -43,19 +43,19 @@ provider "azurerm" {
 data "azurerm_client_config" "current" {}
 
 resource "azurerm_resource_group" "aml" {
-  name     = "azure-ml"
+  name     = "ml-recommenders"
   location = "West US"
 }
 
 resource "azurerm_application_insights" "aml" {
-  name                = "recommender-systems-ai"
+  name                = "recommenders-ai"
   location            = azurerm_resource_group.aml.location
   resource_group_name = azurerm_resource_group.aml.name
   application_type    = "web"
 }
 
 resource "azurerm_key_vault" "aml" {
-  name                     = "recommendersystemspb"
+  name                     = "recommenderskv"
   location                 = azurerm_resource_group.aml.location
   resource_group_name      = azurerm_resource_group.aml.name
   tenant_id                = data.azurerm_client_config.current.tenant_id
@@ -65,20 +65,20 @@ resource "azurerm_key_vault" "aml" {
 
 #storage information
 resource "azurerm_storage_account" "aml" {
-  name                     = "recommendersystemsbucket"
+  name                     = "recommendersdatastore"
   location                 = azurerm_resource_group.aml.location
   resource_group_name      = azurerm_resource_group.aml.name
   account_tier             = "Standard"
   account_replication_type = "GRS"
 }
 resource "azurerm_storage_container" "aml" {
-  name                  = "pbecommdata"
+  name                  = "aliccp"
   storage_account_name  = azurerm_storage_account.aml.name
   container_access_type = "private"
 }
 
 resource "azurerm_container_registry" "aml" {
-  name                     = "recommendsysacr"
+  name                     = "recommendersacr"
   resource_group_name      = azurerm_resource_group.aml.name
   location                 = azurerm_resource_group.aml.location
   sku                      = "Basic"
@@ -87,7 +87,7 @@ resource "azurerm_container_registry" "aml" {
 
 
 resource "azurerm_machine_learning_workspace" "aml" {
-  name                    = "recommend-pb-workspace"
+  name                    = "recommenders-workspace"
   location                = azurerm_resource_group.aml.location
   resource_group_name     = azurerm_resource_group.aml.name
   application_insights_id = azurerm_application_insights.aml.id
@@ -115,7 +115,7 @@ resource "azurerm_subnet" "mltrainingcluster" {
 }
 
 resource "azurerm_machine_learning_compute_cluster" "dataprep" {
-  name                          = "dataprepcpu"
+  name                          = "cpucluster"
   location                      = azurerm_resource_group.aml.location
   vm_priority                   = "Dedicated"
   vm_size                       = "Standard_DS12_v2"
