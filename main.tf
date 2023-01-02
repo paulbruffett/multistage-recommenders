@@ -147,7 +147,7 @@ resource "azurerm_user_assigned_identity" "pbmlidentity" {
 }
 
 resource "azurerm_role_assignment" "rg-contributor" {
-  scope                = azurerm_resource_group.aml.name
+  scope                = azurerm_resource_group.aml.id
   role_definition_name = "Contributor"
   principal_id         = azurerm_user_assigned_identity.pbmlidentity.principal_id
 }
