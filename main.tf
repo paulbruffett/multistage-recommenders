@@ -43,19 +43,19 @@ provider "azurerm" {
 data "azurerm_client_config" "current" {}
 
 resource "azurerm_resource_group" "aml" {
-  name     = "ml-recommenders"
+  name     = "azure-ml"
   location = "West US"
 }
 
 resource "azurerm_application_insights" "aml" {
-  name                = "recommenders-ai"
+  name                = "recommender-systems-ai"
   location            = azurerm_resource_group.aml.location
   resource_group_name = azurerm_resource_group.aml.name
   application_type    = "web"
 }
 
 resource "azurerm_key_vault" "aml" {
-  name                     = "recommenderskv"
+  name                     = "recommendersystemspb"
   location                 = azurerm_resource_group.aml.location
   resource_group_name      = azurerm_resource_group.aml.name
   tenant_id                = data.azurerm_client_config.current.tenant_id
@@ -65,20 +65,20 @@ resource "azurerm_key_vault" "aml" {
 
 #storage information
 resource "azurerm_storage_account" "aml" {
-  name                     = "recommendersdatastore"
+  name                     = "recommendersystemsbucket"
   location                 = azurerm_resource_group.aml.location
   resource_group_name      = azurerm_resource_group.aml.name
   account_tier             = "Standard"
   account_replication_type = "GRS"
 }
 resource "azurerm_storage_container" "aml" {
-  name                  = "aliccp"
+  name                  = "pbecommdata"
   storage_account_name  = azurerm_storage_account.aml.name
   container_access_type = "private"
 }
 
 resource "azurerm_container_registry" "aml" {
-  name                     = "recommendersacr"
+  name                     = "recommendsysacr"
   resource_group_name      = azurerm_resource_group.aml.name
   location                 = azurerm_resource_group.aml.location
   sku                      = "Basic"
@@ -87,7 +87,7 @@ resource "azurerm_container_registry" "aml" {
 
 
 resource "azurerm_machine_learning_workspace" "aml" {
-  name                    = "recommenders-workspace"
+  name                    = "recommend-pb-workspace"
   location                = azurerm_resource_group.aml.location
   resource_group_name     = azurerm_resource_group.aml.name
   application_insights_id = azurerm_application_insights.aml.id
@@ -96,7 +96,10 @@ resource "azurerm_machine_learning_workspace" "aml" {
   container_registry_id   = azurerm_container_registry.aml.id
 
   identity {
-    type = "SystemAssigned"
+    type = "UserAssigned"
+    identity_ids = [
+      azurerm_user_assigned_identity.pbmlidentity.id,
+    ]
   }
 }
 
@@ -115,7 +118,7 @@ resource "azurerm_subnet" "mltrainingcluster" {
 }
 
 resource "azurerm_machine_learning_compute_cluster" "dataprep" {
-  name                          = "cpucluster"
+  name                          = "dataprepcpu"
   location                      = azurerm_resource_group.aml.location
   vm_priority                   = "Dedicated"
   vm_size                       = "Standard_DS12_v2"
@@ -129,6 +132,15 @@ resource "azurerm_machine_learning_compute_cluster" "dataprep" {
   }
 
   identity {
-    type = "SystemAssigned"
+    type = "UserAssigned"
+    identity_ids = [
+      azurerm_user_assigned_identity.pbmlidentity.id,
+    ]
   }
+}
+
+resource "azurerm_user_assigned_identity" "pbmlidentity" {
+  name                = "aml-identity"
+  location            = azurerm_resource_group.aml.location
+  resource_group_name = azurerm_resource_group.aml.name
 }
