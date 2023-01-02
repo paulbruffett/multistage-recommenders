@@ -6,27 +6,14 @@ import numpy as np
 from tqdm import tqdm
 from azureml.fsspec import AzureMachineLearningFileSystem
 
-run = Run.get_context()
+fs = AzureMachineLearningFileSystem('azureml://subscriptions/3bdbda93-8c3a-472b-bdde-25e3028fc307/resourcegroups/mlworkspace/workspaces/mlworkspace/datastores/mlworkspace3685223142/paths/aliccp_train')
 
-ws = run.experiment.workspace
-
-
-datastore = ws.get_default_datastore()
-
-c_client=datastore.blob_service.get_container_client(datastore.container_name)
-
-for i in ["common_features_train.csv", "sample_skeleton_train.csv"]:
-    filename = "aliccp/"+i
-    print(filename)
-    client = datastore.blob_service.get_blob_client(datastore.container_name,filename)
-    blob_stream = client.download_blob()
-    with open(file=i, mode="wb") as download_file:
-        download_file.write(blob_stream.readall())
+print(fs.ls)
 
 def _convert_common_features(common_path, pickle_path=None):
     common = {}
 
-    with open(common_path, "r") as common_features:
+    with fs.open(common_path, "r") as common_features:
         for csv_line in tqdm(common_features, desc="Reading common features..."):
             line = csv_line.strip().split(",")
             kv = np.array(re.split("[]", line[2]))
@@ -43,9 +30,9 @@ def _convert_common_features(common_path, pickle_path=None):
 file_size = 1000000
 current = []
 
-common = _convert_common_features("common_features_train.csv", None)
+common = _convert_common_features("aliccp/common_features_train.csv", None)
 
-with open("sample_skeleton_train.csv", "r") as skeleton:
+with fs.open("aliccp/sample_skeleton_train.csv", "r") as skeleton:
     for i, csv_line in tqdm(enumerate(skeleton), desc="Processing data..."):
 
         line = csv_line.strip().split(",")
