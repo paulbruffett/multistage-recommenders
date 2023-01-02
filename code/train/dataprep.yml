@@ -2,9 +2,5 @@ $schema: https://azuremlschemas.azureedge.net/latest/commandJob.schema.json
 command: |
   python dataprep.py
 code: src
-environment:
-        name: "prepare_data_environment"
-        version: 1
-        image: azureml:AzureML-sklearn-1.0-ubuntu20.04-py38-cpu:1
-        conda_file: .environment.yml
+environment: azureml:AzureML-sklearn-1.0-ubuntu20.04-py38-cpu@latest
 compute: azureml:dataprepcpu
