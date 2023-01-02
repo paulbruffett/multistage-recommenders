@@ -6,8 +6,6 @@ dependencies:
   - python=3.8.16
   - pandas=1.5.2
   - pip:
-    - azureml-core==1.48.0
-    - azure-storage-blob
     - mlflow
     - azure-ai-ml
     - azureml-fsspec mltable
