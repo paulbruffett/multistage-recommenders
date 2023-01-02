@@ -95,13 +95,6 @@ resource "azurerm_machine_learning_workspace" "aml" {
   storage_account_id      = azurerm_storage_account.aml.id
   container_registry_id   = azurerm_container_registry.aml.id
 
-  #primary_user_assigned_identity = azurerm_user_assigned_identity.pbmlidentity.id
-  #identity {
-  #  type = "UserAssigned"
-  #  identity_ids = [
-  #    azurerm_user_assigned_identity.pbmlidentity.id,
-  #  ]
-  #}
   identity {
     type = "SystemAssigned"
   }
@@ -136,15 +129,6 @@ resource "azurerm_machine_learning_compute_cluster" "dataprep" {
   }
 
   identity {
-    type = "UserAssigned"
-    identity_ids = [
-      azurerm_user_assigned_identity.pbmlidentity.id,
-    ]
+    type = "SystemAssigned"
   }
-}
-
-resource "azurerm_user_assigned_identity" "pbmlidentity" {
-  name                = "aml-identity"
-  location            = azurerm_resource_group.aml.location
-  resource_group_name = azurerm_resource_group.aml.name
 }

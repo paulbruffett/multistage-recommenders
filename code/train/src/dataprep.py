@@ -1,10 +1,10 @@
-from azureml.core import Run
 import pandas as pd
 import os
 import pickle
 import re
 import numpy as np
 from tqdm import tqdm
+from azureml.fsspec import AzureMachineLearningFileSystem
 
 run = Run.get_context()
 
