@@ -1,4 +1,4 @@
-name: 'mlpipeline'
+name: 'MlPipeline'
 
 on:
   push:
@@ -10,14 +10,17 @@ on:
     paths:
       - code/train/**
       - infra/**
-      - .github/workflows/mlpipeline.yml
+      - .github/workflows/dataprep.yml
       - cli/setup.sh
 
 jobs:
   prep_and_train:
     name: "DataPrep"
     runs-on: ubuntu-latest
-    steps:          
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+          
       - name: azure login
         uses: azure/login@v1
         with:
