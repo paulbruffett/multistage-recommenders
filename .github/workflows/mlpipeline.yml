@@ -10,7 +10,7 @@ on:
     paths:
       - code/train/**
       - infra/**
-      - .github/workflows/dataprep.yml
+      - .github/workflows/mlpipeline.yml
       - cli/setup.sh
 
 jobs:
