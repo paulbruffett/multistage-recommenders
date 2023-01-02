@@ -10,5 +10,6 @@ dependencies:
     - azure-storage-blob
     - mlflow
     - azure-ai-ml
+    - azureml-fsspec mltable
 channels:
   - conda-forge
