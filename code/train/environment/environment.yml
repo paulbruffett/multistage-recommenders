@@ -8,7 +8,6 @@ dependencies:
   - pip:
     - azure-ai-ml
     - azureml-fsspec 
-    - mltable
     - pandas
 channels:
   - conda-forge
