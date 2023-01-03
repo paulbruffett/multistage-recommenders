@@ -4,10 +4,11 @@
 name: prep_env
 dependencies:
   - python=3.8.16
-  - pandas=1.5.2
+  - pip
   - pip:
     - mlflow
     - azure-ai-ml
     - azureml-fsspec mltable
+    - pandas
 channels:
   - conda-forge
