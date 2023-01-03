@@ -8,7 +8,8 @@ dependencies:
   - pip:
     - mlflow
     - azure-ai-ml
-    - azureml-fsspec mltable
+    - azureml-fsspec 
+    - mltable
     - pandas
 channels:
   - conda-forge
