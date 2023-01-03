@@ -7,5 +7,6 @@ dependencies:
   - pip
   - pip:
     - pandas
+    - azureml-fsspec
 channels:
   - conda-forge
