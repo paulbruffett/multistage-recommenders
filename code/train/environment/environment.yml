@@ -8,3 +8,4 @@ dependencies:
       - tqdm
       - pandas
       - azureml-core
+      - azureml-fsspec
