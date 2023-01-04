@@ -7,5 +7,5 @@ dependencies:
   - pip:
       - tqdm
       - pandas
-      - azureml-core
-      - azureml-fsspec
+      - azure-storage-blob 
+      - azure-identity
