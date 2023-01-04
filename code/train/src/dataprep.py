@@ -8,15 +8,12 @@ from tqdm import tqdm
 from azure.identity import DefaultAzureCredential
 from azure.storage.blob import BlobServiceClient, BlobClient, ContainerClient
 
-connect_str = os.getenv('BLOB_CONNECTION')
+connect_str = os.getenv('connection_string')
 
-account_url = "https://mlworkspace3685223142.blob.core.windows.net"
-default_credential = DefaultAzureCredential()
-
-# Create the BlobServiceClient object
-blob_service_client = BlobServiceClient(account_url, credential=default_credential)
+blob_service_client = BlobServiceClient.from_connection_string(connect_str)
 
 cclient = blob_service_client.get_container_client("azureml-blobstore-64879d37-44cb-403b-b850-a7bc6761c022")
+
 
 blob_stream = cclient.download_blob("aliccp_train/common_features_train.csv")
 with open(file="common_features_train.csv", mode="wb") as download_file:

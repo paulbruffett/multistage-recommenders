@@ -34,5 +34,6 @@ jobs:
       - name: run job
         run: |
             source "${{ github.workspace }}/infra/sdk_helpers.sh";
+            export connection_string = ${{secrets.BLOB_CONNECTION}}
             bash -x run-job.sh dataprep.yml
         working-directory: code/train
