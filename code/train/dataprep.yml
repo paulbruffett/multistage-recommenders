@@ -5,6 +5,6 @@ code: src
 environment:
         name: "prepare_data_environment"
         version: 1
-        image: mcr.microsoft.com/azureml/curated/sklearn-1.0-ubuntu20.04-py38-cpu:32
+        image: mcr.microsoft.com/azureml/curated/tensorflow-2.7-ubuntu20.04-py38-cuda11-gpu:25
         conda_file: ./environment/environment.yml
 compute: azureml:dataprepcpu
