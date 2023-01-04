@@ -8,7 +8,7 @@ from tqdm import tqdm
 from azure.identity import DefaultAzureCredential
 from azure.storage.blob import BlobServiceClient, BlobClient, ContainerClient
 
-connect_str = os.getenv('connection_string')
+connect_str = os.getenv('CONNECTION_STTRING')
 
 blob_service_client = BlobServiceClient.from_connection_string(connect_str)
 
