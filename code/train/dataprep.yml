@@ -1,6 +1,5 @@
 $schema: https://azuremlschemas.azureedge.net/latest/commandJob.schema.json
 command: |
-  az login
   python dataprep.py
 code: src
 environment:
