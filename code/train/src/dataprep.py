@@ -16,6 +16,7 @@ default_credential = DefaultAzureCredential()
 # Create the BlobServiceClient object
 blob_service_client = BlobServiceClient(account_url, credential=default_credential)
 
+cclient = blob_service_client.get_container_client("azureml-blobstore-64879d37-44cb-403b-b850-a7bc6761c022")
 
 blob_stream = cclient.download_blob("aliccp_train/common_features_train.csv")
 with open(file="common_features_train.csv", mode="wb") as download_file:
