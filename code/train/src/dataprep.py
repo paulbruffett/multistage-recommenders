@@ -23,12 +23,12 @@ from azure.storage.blob import BlobServiceClient, BlobClient, ContainerClient
 print(os.listdir("."))
 
 #blob_stream = cclient.download_blob("aliccp_train/common_features_train.csv")
-with open(file="common_features_train.csv", mode="wb") as download_file:
+"""with open(file="common_features_train.csv", mode="wb") as download_file:
     download_file.write(blob_stream.readall())
 
 #blob_stream = cclient.download_blob("aliccp_train/sample_skeleton_train.csv.csv")
 with open(file="sample_skeleton_train.csv.csv", mode="wb") as download_file:
-    download_file.write(blob_stream.readall())
+    download_file.write(blob_stream.readall())"""
 
 def _convert_common_features(common_path, pickle_path=None):
     common = {}
