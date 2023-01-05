@@ -7,4 +7,8 @@ environment:
         version: 1
         image: mcr.microsoft.com/azureml/curated/tensorflow-2.7-ubuntu20.04-py38-cuda11-gpu:25
         conda_file: ./environment/environment.yml
+inputs:
+  data_dir:
+    type: uri_folder 
+    path: azureml://subscriptions/3bdbda93-8c3a-472b-bdde-25e3028fc307/resourcegroups/mlworkspace/workspaces/mlworkspace/datastores/workspaceblobstore/paths/aliccp_train/
 compute: azureml:dataprepcpu
