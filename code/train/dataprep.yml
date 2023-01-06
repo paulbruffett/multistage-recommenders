@@ -1,7 +1,7 @@
 $schema: https://azuremlschemas.azureedge.net/latest/commandJob.schema.json
 command: |
   ls ${{inputs.data_dir}}
-  python dataprep.py --file-location ${{inputs.data_dir}}
+  python dataprep.py --file-location ${{inputs.data_dir}} --target-location ${{outputs.output}}
 code: src
 environment:
         name: "prepare_data_environment"
@@ -12,4 +12,8 @@ inputs:
   data_dir:
     type: uri_folder 
     path: azureml://subscriptions/3bdbda93-8c3a-472b-bdde-25e3028fc307/resourcegroups/mlworkspace/workspaces/mlworkspace/datastores/workspaceblobstore/paths/aliccp_train/
+outputs:
+  output:
+    type: uri_folder
+    path: azureml://subscriptions/3bdbda93-8c3a-472b-bdde-25e3028fc307/resourcegroups/mlworkspace/workspaces/mlworkspace/datastores/workspaceblobstore/paths/${{name}}/
 compute: azureml:dataprepcpu

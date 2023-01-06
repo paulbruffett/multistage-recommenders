@@ -13,6 +13,7 @@ def parse_args():
 
     # add arguments
     parser.add_argument("--file-location", type=str)
+    parser.add_argument("--output-location", type=str)
 
     # parse args
     args = parser.parse_args()
@@ -28,6 +29,7 @@ if __name__ == "__main__":
 
     # run main function
     path = args.file_location
+    output_path = args.output_location
     
     print(path)
     print(os.listdir(path))
@@ -78,6 +80,6 @@ if __name__ == "__main__":
                 index = int((i / file_size) - 1)
                 file_name = f"train_{index}.parquet"
                 df.to_parquet(
-                    os.path.join([path,"train_processed", file_name])
+                    os.path.join([output_path,"train_processed", file_name])
                 )
                 current = []
