@@ -1,6 +1,7 @@
 $schema: https://azuremlschemas.azureedge.net/latest/commandJob.schema.json
 command: |
-  python dataprep.py
+  ls ${{inputs.data_dir}}
+  python dataprep.py --file-path ${{inputs.data_dir}}
 code: src
 environment:
         name: "prepare_data_environment"
