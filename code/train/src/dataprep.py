@@ -75,9 +75,9 @@ if __name__ == "__main__":
     file_size = 1000000
     current = []
 
-    common = _convert_common_features(path+"common_features_train.csv", None)
+    common = _convert_common_features(path+"/common_features_train.csv", None)
 
-    with open(path+"sample_skeleton_train.csv", "r") as skeleton:
+    with open(path+"/sample_skeleton_train.csv", "r") as skeleton:
         for i, csv_line in tqdm(enumerate(skeleton), desc="Processing data..."):
 
             line = csv_line.strip().split(",")
