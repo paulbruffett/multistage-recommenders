@@ -79,6 +79,6 @@ if __name__ == "__main__":
                 index = int((i / file_size) - 1)
                 file_name = f"train_{index}.parquet"
                 df.to_parquet(
-                    os.path.join([output_path,"train_processed", file_name])
+                    os.path.join(output_path,"train_processed", file_name)
                 )
                 current = []
