@@ -33,7 +33,6 @@ if __name__ == "__main__":
     
     print(path)
     print(os.listdir(path))
-    os.makedirs(path+"/train_processed/", exist_ok=True)
 
 
     def _convert_common_features(common_path, pickle_path=None):
