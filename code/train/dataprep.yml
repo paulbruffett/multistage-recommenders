@@ -15,6 +15,6 @@ inputs:
 outputs:
   output:
     type: uri_folder
-    path: azureml://subscriptions/3bdbda93-8c3a-472b-bdde-25e3028fc307/resourcegroups/mlworkspace/workspaces/mlworkspace/datastores/workspaceblobstore/paths/${{name}}/
+    path: azureml://subscriptions/3bdbda93-8c3a-472b-bdde-25e3028fc307/resourcegroups/mlworkspace/workspaces/mlworkspace/datastores/workspaceblobstore/paths/
     mode: rw_mount
 compute: azureml:dataprepcpu
