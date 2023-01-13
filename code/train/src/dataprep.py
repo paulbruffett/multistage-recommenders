@@ -77,6 +77,12 @@ if __name__ == "__main__":
             if i > 0 and i % file_size == 0:
                 df = pd.DataFrame(current)
 
+                df = df.rename(columns={'109_14':"user_categories", "110_14":"user_shops","127_14":"user_brands","150_14":"user_intentions",'121':'user_profile','122':'user_group',
+                       "124":"user_gender","125":"user_age","126":"user_consumption","128":"user_is_occupied","129":"user_geography",
+                       "205":"item_id","206":"item_category","210":"item_intention","216":"item_brand","508":"user_item_categories",
+                       "509":"user_item_shops","702":"user_item_brands","853":"user_item_intentions","301":"position","207":"item_shop",
+                       "127":"user_consumption_2","101":"user_id"})
+
                 index = int((i / file_size) - 1)
                 file_name = f"train_{index}.parquet"
                 df.to_parquet(
