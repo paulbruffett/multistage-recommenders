@@ -63,7 +63,7 @@ if __name__ == "__main__":
 
         common = _convert_common_features(path+"/aliccp_%s/common_features_%s.csv" % (train_type, train_type), None)
 
-        with open(path+"/"+train_type+"/sample_skeleton_%s.csv" % train_type, "r") as skeleton:
+        with open(path+"/aliccp_%s/sample_skeleton_%s.csv" % (train_type,train_type), "r") as skeleton:
             for i, csv_line in tqdm(enumerate(skeleton), desc="Processing data..."):
 
                 line = csv_line.strip().split(",")
