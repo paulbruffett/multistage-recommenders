@@ -34,6 +34,7 @@ if __name__ == "__main__":
     print(path)
     print(os.listdir(path))
     os.makedirs(output_path+"/train_processed/", exist_ok=True)
+    os.makedirs(output_path+"/test_processed/", exist_ok=True)
 
 
     def _convert_common_features(common_path, pickle_path=None):
@@ -52,40 +53,44 @@ if __name__ == "__main__":
                     pickle.dump(common, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
         return common
+    
 
-    file_size = 1000000
-    current = []
+    for train_type in ['train','test']:
 
-    common = _convert_common_features(path+"/common_features_train.csv", None)
 
-    with open(path+"/sample_skeleton_train.csv", "r") as skeleton:
-        for i, csv_line in tqdm(enumerate(skeleton), desc="Processing data..."):
+        file_size = 1000000
+        current = []
 
-            line = csv_line.strip().split(",")
-            if line[1] == "0" and line[2] == "1":
-                continue
-            kv = np.array(re.split("[]", line[5]))
-            key = kv[range(0, len(kv), 3)]
-            value = kv[range(1, len(kv), 3)]
-            feat_dict = dict(zip(key, value))
-            feat_dict.update(common[line[3]])
-            feat_dict["click"] = int(line[1])
-            feat_dict["conversion"] = int(line[2])
+        common = _convert_common_features(path+"/common_features_%s.csv" % train_type, None)
 
-            current.append(feat_dict)
+        with open(path+"/"+train_type+"/sample_skeleton_%s.csv" % train_type, "r") as skeleton:
+            for i, csv_line in tqdm(enumerate(skeleton), desc="Processing data..."):
 
-            if i > 0 and i % file_size == 0:
-                df = pd.DataFrame(current)
+                line = csv_line.strip().split(",")
+                if line[1] == "0" and line[2] == "1":
+                    continue
+                kv = np.array(re.split("[]", line[5]))
+                key = kv[range(0, len(kv), 3)]
+                value = kv[range(1, len(kv), 3)]
+                feat_dict = dict(zip(key, value))
+                feat_dict.update(common[line[3]])
+                feat_dict["click"] = int(line[1])
+                feat_dict["conversion"] = int(line[2])
 
-                df = df.rename(columns={'109_14':"user_categories", "110_14":"user_shops","127_14":"user_brands","150_14":"user_intentions",'121':'user_profile','122':'user_group',
-                       "124":"user_gender","125":"user_age","126":"user_consumption","128":"user_is_occupied","129":"user_geography",
-                       "205":"item_id","206":"item_category","210":"item_intention","216":"item_brand","508":"user_item_categories",
-                       "509":"user_item_shops","702":"user_item_brands","853":"user_item_intentions","301":"position","207":"item_shop",
-                       "127":"user_consumption_2","101":"user_id"})
+                current.append(feat_dict)
 
-                index = int((i / file_size) - 1)
-                file_name = f"train_{index}.parquet"
-                df.to_parquet(
-                    os.path.join(output_path,"train_processed", file_name)
-                )
-                current = []
+                if i > 0 and i % file_size == 0:
+                    df = pd.DataFrame(current)
+
+                    df = df.rename(columns={'109_14':"user_categories", "110_14":"user_shops","127_14":"user_brands","150_14":"user_intentions",'121':'user_profile','122':'user_group',
+                        "124":"user_gender","125":"user_age","126":"user_consumption","128":"user_is_occupied","129":"user_geography",
+                        "205":"item_id","206":"item_category","210":"item_intention","216":"item_brand","508":"user_item_categories",
+                        "509":"user_item_shops","702":"user_item_brands","853":"user_item_intentions","301":"position","207":"item_shop",
+                        "127":"user_consumption_2","101":"user_id"})
+
+                    index = int((i / file_size) - 1)
+                    file_name = f"%s_{index}.parquet" % train_type
+                    df.to_parquet(
+                        os.path.join(output_path,"%s_processed" % train_type, file_name)
+                    )
+                    current = []
