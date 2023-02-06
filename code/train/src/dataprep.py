@@ -57,6 +57,11 @@ if __name__ == "__main__":
 
     for train_type in ['train','test']:
 
+        if not os.listdir(output_path+"/%s_processed/" % train_type):
+            print("Directory is empty")
+        else:    
+            print("Directory is not empty")
+            continue
 
         file_size = 1000000
         current = []
