@@ -37,3 +37,9 @@ jobs:
             export CONNECTION_STRING=${{secrets.BLOB_CONNECTION}}
             bash -x run-job.sh dataprep.yml
         working-directory: code/train
+      - name: train
+        run: |
+            source "${{ github.workspace }}/infra/sdk_helpers.sh";
+            export CONNECTION_STRING=${{secrets.BLOB_CONNECTION}}
+            bash -x run-job.sh algo_training.yml
+        working-directory: code/train

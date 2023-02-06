@@ -1,0 +1,10 @@
+name: prepare-env
+channels:
+  - conda-forge
+dependencies:
+  - python>=3.7
+  - pip
+  - pip:
+      - tensorflow-recommenders
+      - pandas
+      - mlflow
