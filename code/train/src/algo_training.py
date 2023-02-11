@@ -67,6 +67,7 @@ if __name__ == "__main__":
     item_ids = tf.data.Dataset.from_tensor_slices(tf.convert_to_tensor(df_features['item_id'].values,dtype=tf.int64))
 
     embedding_dimension = 32
+    mlflow.log_param("embedding_dimension", embedding_dimension)
 
     user_model = tf.keras.Sequential([
     tf.keras.layers.IntegerLookup(

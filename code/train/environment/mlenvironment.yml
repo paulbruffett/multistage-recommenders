@@ -8,3 +8,4 @@ dependencies:
       - tensorflow-recommenders
       - pandas
       - mlflow
+      - azureml-mlflow
