@@ -12,4 +12,4 @@ inputs:
   data_dir:
     type: uri_folder 
     path: azureml://subscriptions/3bdbda93-8c3a-472b-bdde-25e3028fc307/resourcegroups/mlworkspace/workspaces/mlworkspace/datastores/workspaceblobstore/paths/
-compute: azureml:dataprepcpu
+compute: azureml:traininggpu
