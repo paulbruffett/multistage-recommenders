@@ -10,3 +10,4 @@ dependencies:
       - mlflow
       - azureml-mlflow
       - tensorboard == 2.11.2
+      - tensorboard_plugin_profile
