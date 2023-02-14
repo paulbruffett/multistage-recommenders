@@ -9,3 +9,4 @@ dependencies:
       - pandas
       - mlflow
       - azureml-mlflow
+      - tensorboard

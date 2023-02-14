@@ -17,6 +17,7 @@ def parse_args():
 
     # add arguments
     parser.add_argument("--file-location", type=str)
+    parser.add_argument("--output-location", type=str)
 
     # parse args
     args = parser.parse_args()
@@ -34,6 +35,8 @@ if __name__ == "__main__":
 
     # run main function
     path = args.file_location
+    log_path = args.output_location
+    tensorboard_callback = tf.keras.callbacks.TensorBoard(log_dir=log_path+"/logs")
 
     df = pd.read_parquet(path+'/train_processed/')
 
@@ -114,4 +117,4 @@ if __name__ == "__main__":
 
     cached_train = train_dataset.batch(8192).cache()
 
-    model.fit(cached_train, epochs=30)
+    model.fit(cached_train, epochs=30,callbacks=[tensorboard_callback])
