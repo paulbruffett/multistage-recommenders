@@ -52,7 +52,7 @@ if __name__ == "__main__":
 
     f_dataset = tf.data.Dataset.from_tensor_slices(df_tensor)
 
-    len_train = round(len(f_dataset)*.8)
+    len_train = round(len(f_dataset)*.2)
     len_test = round(len(f_dataset)*.2)
 
     tf.random.set_seed(42)
@@ -117,4 +117,4 @@ if __name__ == "__main__":
 
     cached_train = train_dataset.batch(8192).cache()
 
-    model.fit(cached_train, epochs=30,callbacks=[tensorboard_callback])
+    model.fit(cached_train, epochs=1,callbacks=[tensorboard_callback])
