@@ -36,7 +36,7 @@ if __name__ == "__main__":
     # run main function
     path = args.file_location
     log_path = args.output_location
-    tensorboard_callback = tf.keras.callbacks.TensorBoard(log_dir=log_path+"/logs")
+    tensorboard_callback = tf.keras.callbacks.TensorBoard(log_dir=log_path+"/logs", profile_batch=(0,5))
 
     df = pd.read_parquet(path+'/train_processed/')
 
