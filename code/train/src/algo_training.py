@@ -34,8 +34,8 @@ if __name__ == "__main__":
 
     mlflow.tensorflow.autolog()
 
-    #get timestamp as string
-    now = datetime.now()
+    #get hour and minute as string
+    now = datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
 
     # run main function
     path = args.file_location
