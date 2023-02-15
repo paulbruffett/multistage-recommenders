@@ -9,6 +9,7 @@ import numpy as np
 import tensorflow as tf
 import mlflow
 import tensorflow_recommenders as tfrs
+import datetime
 
 
 def parse_args():
@@ -33,10 +34,13 @@ if __name__ == "__main__":
 
     mlflow.tensorflow.autolog()
 
+    #get timestamp as string
+    now = datetime.now()
+
     # run main function
     path = args.file_location
     log_path = args.output_location
-    tensorboard_callback = tf.keras.callbacks.TensorBoard(log_dir=log_path+"/logs", profile_batch=(0,5))
+    tensorboard_callback = tf.keras.callbacks.TensorBoard(log_dir=log_path+"/logs/"+now, profile_batch=(0,5))
 
     df = pd.read_parquet(path+'/train_processed/')
 
