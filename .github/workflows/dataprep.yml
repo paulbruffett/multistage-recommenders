@@ -34,12 +34,14 @@ jobs:
       - name: run job
         run: |
             source "${{ github.workspace }}/infra/sdk_helpers.sh";
-            export AZURE_SUBSCRIPTION=${{ secrets.AZURE_SUBSCRIPTION }}
             bash -x run-job.sh dataprep.yml
+        env:
+          AZURE_SUBSCRIPTION: ${{ secrets.AZURE_SUBSCRIPTION }}
         working-directory: code/train
       - name: train
         run: |
             source "${{ github.workspace }}/infra/sdk_helpers.sh";
-            export AZURE_SUBSCRIPTION=${{ secrets.AZURE_SUBSCRIPTION }}
             bash -x run-job.sh algo_training.yml
+        env:
+          AZURE_SUBSCRIPTION: ${{ secrets.AZURE_SUBSCRIPTION }}
         working-directory: code/train
