@@ -11,10 +11,10 @@ environment:
 inputs:
   data_dir:
     type: uri_folder 
-    path: azureml://datastores/workspaceblobstore/paths/aliccp_train/
+    path: azureml://datastores/workspaceblobstore/paths/
 outputs:
   output:
     type: uri_folder
-    path: azureml://datastores/workspaceblobstore/paths/aliccp_train/
+    path: azureml://datastores/workspaceblobstore/paths/
     mode: rw_mount
 compute: azureml:dataprepcpu
