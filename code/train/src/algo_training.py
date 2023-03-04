@@ -74,7 +74,7 @@ if __name__ == "__main__":
 
 
     tf.random.set_seed(42)
-    train = train.shuffle(len(train), seed=42, reshuffle_each_iteration=False)
+    train = train.shuffle(10000, seed=42, reshuffle_each_iteration=False)
 
     train_len = round(len(train)*.8)
     test = train.skip(train_len).take(len(train)-train_len)

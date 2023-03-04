@@ -11,10 +11,10 @@ environment:
 inputs:
   data_dir:
     type: uri_folder 
-    path: azureml://subscriptions/${{secrets.AZURE_SUBSCRIPTION}}/resourcegroups/mlworkspace/workspaces/mlworkspace/datastores/workspaceblobstore/paths/
+    path: azureml://subscriptions/${CONNECTION_STRING}/resourcegroups/mlworkspace/workspaces/mlworkspace/datastores/workspaceblobstore/paths/
 outputs:
   output:
     type: uri_folder
-    path: azureml://subscriptions/${{secrets.AZURE_SUBSCRIPTION}}/resourcegroups/mlworkspace/workspaces/mlworkspace/datastores/workspaceblobstore/paths/
+    path: azureml://subscriptions/${CONNECTION_STRING}/resourcegroups/mlworkspace/workspaces/mlworkspace/datastores/workspaceblobstore/paths/
     mode: rw_mount
 compute: azureml:dataprepcpu
