@@ -63,6 +63,12 @@ if __name__ == "__main__":
     df_agg = df_agg[df_agg['counter']>500]
     train = pd.merge(df_agg, train, on=['item_id', 'item_id'], how='left')
     print(len(train))
+    train['counter'] = 1
+    cust_agg = train[['user_id','counter']].groupby('user_id').count()
+    cust_agg = cust_agg[cust_agg['counter']>50]
+    train = pd.merge(cust_agg, train, on=['user_id', 'user_id'], how='left')
+    print(len(train))
+
 
     train, df_features = dataset_to_tensor(train)
 
@@ -70,6 +76,10 @@ if __name__ == "__main__":
     tf.random.set_seed(42)
     train = train.shuffle(len(train), seed=42, reshuffle_each_iteration=False)
 
+    train_len = round(len(train)*.8)
+    test = train.skip(train_len).take(len(train)-train_len)
+    train = train.take(train_len)
+    print("len train ", len(train), " len test ", len(test))
     
     #train = train.take(round(len(train)*0.01))
 
@@ -129,15 +139,21 @@ if __name__ == "__main__":
 
     cached_train = train_dataset.batch(512).cache()
 
-    model.fit(cached_train, epochs=15,callbacks=[tensorboard_callback])
+    model.fit(cached_train, epochs=4,callbacks=[tensorboard_callback])
 
-    del df_features,train,train_dataset,cached_train
+    test_dataset = test.map(lambda x: {
+        "user_id": x[1],
+        "item_id": x[0],
+    })
+
+    model.evaluate(test_dataset.batch(512), return_dict=True, callbacks=[tensorboard_callback])
+
+    """del df_features,train,train_dataset,cached_train
     gc.collect()
 
     test = pd.read_parquet(path+'/test_processed/')
     test = pd.merge(df_agg, test, on=['item_id', 'item_id'], how='left')
     test, _ = dataset_to_tensor(test)
-    #test = test.take(round(len(test)*0.01))
 
     test_dataset = test.map(lambda x: {
         "user_id": x[1],
@@ -146,7 +162,7 @@ if __name__ == "__main__":
 
     cached_test = test_dataset.batch(512).cache()
 
-    model.evaluate(cached_test, return_dict=True, callbacks=[tensorboard_callback])
+    model.evaluate(cached_test, return_dict=True, callbacks=[tensorboard_callback])"""
 
     index = tfrs.layers.factorized_top_k.BruteForce(model.user_model,k = 50)
 
