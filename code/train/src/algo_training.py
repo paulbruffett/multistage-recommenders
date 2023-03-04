@@ -27,17 +27,6 @@ def parse_args():
     # return args
     return args
 
-def dataset_to_tensor(df):
-    features = ['item_id','user_id']
-    for i in features:
-        df[i] = pd.to_numeric(df[i], errors='coerce',downcast="integer")
-
-    df_features = df[df['click']==1][['item_id','user_id']]
-    df_features= df_features.dropna()
-    df_tensor = tf.convert_to_tensor(df_features, dtype=tf.int64)
-
-    f_dataset = tf.data.Dataset.from_tensor_slices(df_tensor)
-    return f_dataset, df_features
 
 # run script
 if __name__ == "__main__":
@@ -54,51 +43,64 @@ if __name__ == "__main__":
     log_path = args.output_location
     tensorboard_callback = tf.keras.callbacks.TensorBoard(log_dir=log_path+"/logs/"+now)
 
-    train = pd.read_parquet(path+'/train_processed/')
-
+    df_train = pd.read_parquet(path+'/train_processed/')
+    print(len(df_train))
 
     #filter out long tail products and reduce size of dataset
-    train['counter'] = 1
-    df_agg = train[['item_id','counter']].groupby('item_id').count()
-    df_agg = df_agg[df_agg['counter']>500]
-    train = pd.merge(df_agg, train, on=['item_id', 'item_id'], how='left')
-    print(len(train))
-    train['counter'] = 1
-    cust_agg = train[['user_id','counter']].groupby('user_id').count()
-    cust_agg = cust_agg[cust_agg['counter']>50]
-    train = pd.merge(cust_agg, train, on=['user_id', 'user_id'], how='left')
-    print(len(train))
+    df_train['counter'] = 1
+    df_agg = df_train[['item_id','counter']].groupby('item_id').count()
+    df_agg = df_agg.sort_values("counter",ascending=False)[:10000]
+    df_train = pd.merge(df_agg, df_train, on=['item_id', 'item_id'], how='left')
+    print(len(df_train))
+    df_train['counter'] = 1
+    cust_agg = df_train[['user_id','counter']].groupby('user_id').count()
+    cust_agg = cust_agg.sort_values("counter",ascending=False)[:8000]
+    df_train = pd.merge(cust_agg, df_train, on=['user_id', 'user_id'], how='left')
+    print(len(df_train))
+
+    train = df_train[df_train['click']==1][['item_id','user_id']]
+    features = ['item_id','user_id']
+    for i in features:
+        train[i] = pd.to_numeric(train[i], errors='coerce',downcast="integer")
+    train= train.dropna()
+
+    items = train['item_id'].unique()
+    items = tf.convert_to_tensor(items, dtype=tf.int64)
+
+    train = tf.convert_to_tensor(train, dtype=tf.int64)
 
 
-    train, df_features = dataset_to_tensor(train)
+    train = tf.data.Dataset.from_tensor_slices(train)
 
+    train_dataset = train.map(lambda x: {
+        "item_id": x[0],
+        "user_id": x[1],
+    })
+
+    items = tf.data.Dataset.from_tensor_slices(items)
 
     tf.random.set_seed(42)
-    train = train.shuffle(10000, seed=42, reshuffle_each_iteration=False)
+    shuffled = train_dataset.shuffle(100000, seed=42, reshuffle_each_iteration=False)
 
-    train_len = round(len(train)*.8)
-    test = train.skip(train_len).take(len(train)-train_len)
-    train = train.take(train_len)
-    print("len train ", len(train), " len test ", len(test))
-    
-    #train = train.take(round(len(train)*0.01))
+    split = round(len(shuffled)*.8)
 
-    unique_items = np.unique(df_features['item_id'].values.squeeze())
-    unique_users = np.unique(df_features['user_id'].values.squeeze())
+    train = shuffled.take(split)
+    test = shuffled.skip(split).take(len(shuffled)-split)
 
-    unique_items = tf.convert_to_tensor(unique_items,dtype=tf.int32)
-    unique_users = tf.convert_to_tensor(unique_users,dtype=tf.int32)
+    items = items.batch(1_000)
+    user_ids = train_dataset.batch(1_000_000).map(lambda x: x["user_id"])
 
-    item_ids = tf.data.Dataset.from_tensor_slices(tf.convert_to_tensor(df_features['item_id'].values,dtype=tf.int64))
+    unique_items= np.unique(np.concatenate(list(items)))
+    unique_user_ids = np.unique(np.concatenate(list(user_ids)))
 
     embedding_dimension = 64
     mlflow.log_param("embedding_dimension", embedding_dimension)
 
     user_model = tf.keras.Sequential([
     tf.keras.layers.IntegerLookup(
-        vocabulary=unique_users, mask_token=None),
+        vocabulary=unique_user_ids, mask_token=None),
     # We add an additional embedding to account for unknown tokens.
-    tf.keras.layers.Embedding(len(unique_users) + 1, embedding_dimension)
+    tf.keras.layers.Embedding(len(unique_user_ids) + 1, embedding_dimension)
     ])
 
     item_model = tf.keras.Sequential([
@@ -107,7 +109,7 @@ if __name__ == "__main__":
     tf.keras.layers.Embedding(len(unique_items) + 1, embedding_dimension)
     ])
 
-    metrics = tfrs.metrics.FactorizedTopK(candidates=item_ids.batch(128).map(item_model))
+    metrics = tfrs.metrics.FactorizedTopK(candidates=items.batch(128).map(item_model))
 
     task = tfrs.tasks.Retrieval(metrics=metrics)
 
@@ -132,41 +134,16 @@ if __name__ == "__main__":
     model.compile(optimizer=tf.keras.optimizers.Adagrad(learning_rate=0.1))
 
 
-    train_dataset = train.map(lambda x: {
-        "user_id": x[1],
-        "item_id": x[0],
-    })
-
     cached_train = train_dataset.batch(512).cache()
 
     model.fit(cached_train, epochs=4,callbacks=[tensorboard_callback])
 
-    test_dataset = test.map(lambda x: {
-        "user_id": x[1],
-        "item_id": x[0],
-    })
 
-    model.evaluate(test_dataset.batch(512), return_dict=True, callbacks=[tensorboard_callback])
-
-    """del df_features,train,train_dataset,cached_train
-    gc.collect()
-
-    test = pd.read_parquet(path+'/test_processed/')
-    test = pd.merge(df_agg, test, on=['item_id', 'item_id'], how='left')
-    test, _ = dataset_to_tensor(test)
-
-    test_dataset = test.map(lambda x: {
-        "user_id": x[1],
-        "item_id": x[0],
-    })
-
-    cached_test = test_dataset.batch(512).cache()
-
-    model.evaluate(cached_test, return_dict=True, callbacks=[tensorboard_callback])"""
+    model.evaluate(test.batch(512), return_dict=True, callbacks=[tensorboard_callback])
 
     index = tfrs.layers.factorized_top_k.BruteForce(model.user_model,k = 50)
 
-    index.index_from_dataset(tf.data.Dataset.zip((item_ids.batch(100), item_ids.batch(100).map(model.item_model))))
+    index.index_from_dataset(tf.data.Dataset.zip((items.batch(100), items.batch(100).map(model.item_model))))
 
     _, titles = index(tf.constant([42]))
     print(titles)
