@@ -11,10 +11,10 @@ environment:
 inputs:
   data_dir:
     type: uri_folder 
-    path: azureml://subscriptions/${CONNECTION_STRING}/resourcegroups/mlworkspace/workspaces/mlworkspace/datastores/workspaceblobstore/paths/
+    path: ${CONNECTION_STRING}
 outputs:
   output:
     type: uri_folder
-    path: azureml://subscriptions/${CONNECTION_STRING}/resourcegroups/mlworkspace/workspaces/mlworkspace/datastores/workspaceblobstore/paths/
+    path: ${CONNECTION_STRING}
     mode: rw_mount
 compute: azureml:dataprepcpu
