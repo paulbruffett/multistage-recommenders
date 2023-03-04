@@ -134,7 +134,8 @@ if __name__ == "__main__":
     model.compile(optimizer=tf.keras.optimizers.Adagrad(learning_rate=0.1))
 
 
-    cached_train = train_dataset.batch(512).cache()
+    cached_train = train.shuffle(100_000).batch(8192).cache()
+    cached_test = test.batch(4096).cache()
 
     model.fit(cached_train, epochs=4,callbacks=[tensorboard_callback])
 
