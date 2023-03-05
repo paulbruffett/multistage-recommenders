@@ -72,75 +72,72 @@ if __name__ == "__main__":
 
     train = tf.data.Dataset.from_tensor_slices(train)
 
-    train_dataset = train.map(lambda x: {
+    ratings = train.map(lambda x: {
         "item_id": x[0],
         "user_id": x[1],
     })
 
-    items = tf.data.Dataset.from_tensor_slices(items)
+    movies = tf.data.Dataset.from_tensor_slices(items)
 
     tf.random.set_seed(42)
-    shuffled = train_dataset.shuffle(100000, seed=42, reshuffle_each_iteration=False)
+    shuffled = ratings.shuffle(100000, seed=42, reshuffle_each_iteration=False)
 
     split = round(len(shuffled)*.8)
 
     train = shuffled.take(split)
     test = shuffled.skip(split).take(len(shuffled)-split)
 
-    items = items.batch(1_000)
-    user_ids = train_dataset.batch(1_000_000).map(lambda x: x["user_id"])
+    movie_titles = movies.batch(1_000)
+    user_ids = ratings.batch(1_000_000).map(lambda x: x["user_id"])
 
-    unique_items= np.unique(np.concatenate(list(items)))
+    unique_movie_titles = np.unique(np.concatenate(list(movie_titles)))
     unique_user_ids = np.unique(np.concatenate(list(user_ids)))
 
     embedding_dimension = 64
-    mlflow.log_param("embedding_dimension", embedding_dimension)
 
     user_model = tf.keras.Sequential([
-    tf.keras.layers.IntegerLookup(
-        vocabulary=unique_user_ids, mask_token=None),
-    # We add an additional embedding to account for unknown tokens.
-    tf.keras.layers.Embedding(len(unique_user_ids) + 1, embedding_dimension)
-    ])
+        tf.keras.layers.IntegerLookup(
+            vocabulary=unique_user_ids, mask_token=None),
+        # We add an additional embedding to account for unknown tokens.
+        tf.keras.layers.Embedding(len(unique_user_ids) + 1, embedding_dimension)
+        ])
 
-    item_model = tf.keras.Sequential([
-    tf.keras.layers.IntegerLookup(
-        vocabulary=unique_items, mask_token=None),
-    tf.keras.layers.Embedding(len(unique_items) + 1, embedding_dimension)
-    ])
-
-    metrics = tfrs.metrics.FactorizedTopK(candidates=items.batch(128).map(item_model))
+    movie_model = tf.keras.Sequential([
+        tf.keras.layers.IntegerLookup(
+            vocabulary=unique_movie_titles, mask_token=None),
+        tf.keras.layers.Embedding(len(unique_movie_titles) + 1, embedding_dimension)
+        ])
+    
+    metrics = tfrs.metrics.FactorizedTopK(candidates=movies.batch(128).map(movie_model))
 
     task = tfrs.tasks.Retrieval(metrics=metrics)
 
-    class RetrievalModel(tfrs.Model):
-        def __init__(self, user_model, item_model):
+    class MovielensModel(tfrs.Model):
+
+        def __init__(self, user_model, movie_model):
             super().__init__()
-            self.item_model: tf.keras.Model = item_model
+            self.movie_model: tf.keras.Model = movie_model
             self.user_model: tf.keras.Model = user_model
             self.task: tf.keras.layers.Layer = task
 
-        def compute_loss(self, features, training=False) -> tf.Tensor:
+        def compute_loss(self, features: Dict[Text, tf.Tensor], training=False) -> tf.Tensor:
             # We pick out the user features and pass them into the user model.
-            user_embeddings = self.user_model(features['user_id'])
+            user_embeddings = self.user_model(features["user_id"])
             # And pick out the movie features and pass them into the movie model,
             # getting embeddings back.
-            positive_item_embeddings = self.item_model(features['item_id'])
+            positive_movie_embeddings = self.movie_model(features["item_id"])
 
             # The task computes the loss and the metrics.
-            return self.task(user_embeddings, positive_item_embeddings)
-        
-    model = RetrievalModel(user_model, item_model)
-    model.compile(optimizer=tf.keras.optimizers.Adagrad(learning_rate=0.1))
+            return self.task(user_embeddings, positive_movie_embeddings)
 
+
+    model = MovielensModel(user_model, movie_model)
+    model.compile(optimizer=tf.keras.optimizers.Adagrad(learning_rate=0.1))
 
     cached_train = train.shuffle(100_000).batch(8192).cache()
     cached_test = test.batch(4096).cache()
 
-    model.fit(cached_train, epochs=4,callbacks=[tensorboard_callback])
-
-
-    model.evaluate(test.batch(512), return_dict=True, callbacks=[tensorboard_callback])
+    model.fit(cached_train, epochs=15)
 
     index = tfrs.layers.factorized_top_k.BruteForce(model.user_model,k = 50)
 
