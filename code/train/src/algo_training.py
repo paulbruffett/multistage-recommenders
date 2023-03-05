@@ -72,25 +72,25 @@ if __name__ == "__main__":
 
     train = tf.data.Dataset.from_tensor_slices(train)
 
-    ratings = train.map(lambda x: {
+    interactions = train.map(lambda x: {
         "item_id": x[0],
         "user_id": x[1],
     })
 
-    movies = tf.data.Dataset.from_tensor_slices(items)
+    items_ds = tf.data.Dataset.from_tensor_slices(items)
 
     tf.random.set_seed(42)
-    shuffled = ratings.shuffle(100000, seed=42, reshuffle_each_iteration=False)
+    shuffled = interactions.shuffle(100000, seed=42, reshuffle_each_iteration=False)
 
     split = round(len(shuffled)*.8)
 
     train = shuffled.take(split)
     test = shuffled.skip(split).take(len(shuffled)-split)
 
-    movie_titles = movies.batch(1_000)
-    user_ids = ratings.batch(1_000_000).map(lambda x: x["user_id"])
+    item_batch = items_ds.batch(1_000)
+    user_ids = interactions.batch(1_000_000).map(lambda x: x["user_id"])
 
-    unique_movie_titles = np.unique(np.concatenate(list(movie_titles)))
+    unique_items = np.unique(np.concatenate(list(item_batch)))
     unique_user_ids = np.unique(np.concatenate(list(user_ids)))
 
     embedding_dimension = 64
@@ -102,21 +102,21 @@ if __name__ == "__main__":
         tf.keras.layers.Embedding(len(unique_user_ids) + 1, embedding_dimension)
         ])
 
-    movie_model = tf.keras.Sequential([
+    item_model = tf.keras.Sequential([
         tf.keras.layers.IntegerLookup(
-            vocabulary=unique_movie_titles, mask_token=None),
-        tf.keras.layers.Embedding(len(unique_movie_titles) + 1, embedding_dimension)
+            vocabulary=unique_items, mask_token=None),
+        tf.keras.layers.Embedding(len(unique_items) + 1, embedding_dimension)
         ])
     
-    metrics = tfrs.metrics.FactorizedTopK(candidates=movies.batch(128).map(movie_model))
+    metrics = tfrs.metrics.FactorizedTopK(candidates=items_ds.batch(128).map(movie_model))
 
     task = tfrs.tasks.Retrieval(metrics=metrics)
 
     class MovielensModel(tfrs.Model):
 
-        def __init__(self, user_model, movie_model):
+        def __init__(self, user_model, item_model):
             super().__init__()
-            self.movie_model: tf.keras.Model = movie_model
+            self.item_model: tf.keras.Model = item_model
             self.user_model: tf.keras.Model = user_model
             self.task: tf.keras.layers.Layer = task
 
@@ -125,13 +125,13 @@ if __name__ == "__main__":
             user_embeddings = self.user_model(features["user_id"])
             # And pick out the movie features and pass them into the movie model,
             # getting embeddings back.
-            positive_movie_embeddings = self.movie_model(features["item_id"])
+            positive_movie_embeddings = self.item_model(features["item_id"])
 
             # The task computes the loss and the metrics.
             return self.task(user_embeddings, positive_movie_embeddings)
 
 
-    model = MovielensModel(user_model, movie_model)
+    model = MovielensModel(user_model, item_model)
     model.compile(optimizer=tf.keras.optimizers.Adagrad(learning_rate=0.1))
 
     cached_train = train.shuffle(100_000).batch(8192).cache()
@@ -141,7 +141,7 @@ if __name__ == "__main__":
 
     index = tfrs.layers.factorized_top_k.BruteForce(model.user_model,k = 50)
 
-    index.index_from_dataset(tf.data.Dataset.zip((movies.batch(100), movies.batch(100).map(model.movie_model))))
+    index.index_from_dataset(tf.data.Dataset.zip((items_ds.batch(100), items_ds.batch(100).map(model.item_model))))
 
     _, titles = index(tf.constant([42]))
     print(titles)
