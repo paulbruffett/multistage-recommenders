@@ -141,7 +141,7 @@ if __name__ == "__main__":
 
     index = tfrs.layers.factorized_top_k.BruteForce(model.user_model,k = 50)
 
-    index.index_from_dataset(tf.data.Dataset.zip((items.batch(100), items.batch(100).map(model.item_model))))
+    index.index_from_dataset(tf.data.Dataset.zip((movies.batch(100), movies.batch(100).map(model.movie_model))))
 
     _, titles = index(tf.constant([42]))
     print(titles)
