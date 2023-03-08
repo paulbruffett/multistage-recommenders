@@ -108,7 +108,7 @@ if __name__ == "__main__":
         tf.keras.layers.Embedding(len(unique_items) + 1, embedding_dimension)
         ])
     
-    metrics = tfrs.metrics.FactorizedTopK(candidates=items_ds.batch(128).map(movie_model))
+    metrics = tfrs.metrics.FactorizedTopK(candidates=items_ds.batch(128).map(item_model))
 
     task = tfrs.tasks.Retrieval(metrics=metrics)
 
