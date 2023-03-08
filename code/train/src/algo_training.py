@@ -112,7 +112,7 @@ if __name__ == "__main__":
 
     task = tfrs.tasks.Retrieval(metrics=metrics)
 
-    class MovielensModel(tfrs.Model):
+    class RecommendationModel(tfrs.Model):
 
         def __init__(self, user_model, item_model):
             super().__init__()
@@ -131,7 +131,7 @@ if __name__ == "__main__":
             return self.task(user_embeddings, positive_movie_embeddings)
 
 
-    model = MovielensModel(user_model, item_model)
+    model = RecommendationModel(user_model, item_model)
     model.compile(optimizer=tf.keras.optimizers.Adagrad(learning_rate=0.1))
 
     cached_train = train.shuffle(100_000).batch(8192).cache()
@@ -146,4 +146,4 @@ if __name__ == "__main__":
     _, titles = index(tf.constant([42]))
     print(titles)
     tf.saved_model.save(index, "index")
-    mlflow.log_artifacts("index", "index")
+    mlflow.log_artifacts("index")
