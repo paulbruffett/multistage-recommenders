@@ -139,6 +139,8 @@ if __name__ == "__main__":
 
     model.fit(cached_train, epochs=15)
 
+    model.evaluate(cached_test, return_dict=True)
+
     index = tfrs.layers.factorized_top_k.BruteForce(model.user_model,k = 50)
 
     index.index_from_dataset(tf.data.Dataset.zip((items_ds.batch(100), items_ds.batch(100).map(model.item_model))))
