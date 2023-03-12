@@ -1,6 +1,4 @@
 import os
-import pprint
-import tempfile
 import argparse
 
 from typing import Dict, Text
@@ -10,7 +8,6 @@ import tensorflow as tf
 import mlflow
 import tensorflow_recommenders as tfrs
 import datetime
-import gc
 
 
 def parse_args():
@@ -149,3 +146,4 @@ if __name__ == "__main__":
     print(titles)
     tf.saved_model.save(index, "index")
     mlflow.log_artifacts("index")
+    print(os.listdir("index"))
